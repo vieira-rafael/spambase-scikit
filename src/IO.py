@@ -1,6 +1,6 @@
 # coding> utf-8
 
-from collections import namedtuple
+from datatypes import Dataset
 
 def load_spam_ds():
     """
@@ -9,7 +9,6 @@ def load_spam_ds():
     () -> NamedTuple(Dataset)
     """
 
-    Dataset = namedtuple("Dataset", ["data", "target"] )
     data = []
     target = []
 
