@@ -14,3 +14,9 @@ def univariate_feature_selection(n, ds):
     selector.fit(ds.data, ds.target)
     features = selector.get_support(indices=True)
     return Dataset(selector.transform(ds.data), ds.target)
+
+def lda():
+    pass
+
+def qda():
+    pass

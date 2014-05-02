@@ -1,11 +1,11 @@
 # coding> utf-8
 
 from datatypes import Dataset
-from classifier import naive_bayes_classifier, classify
+from classifier import *
+
 from feature_selection import univariate_feature_selection
-
 from sklearn.cross_validation import train_test_split
-
+from numpy import mean, var, sum, diag
 
 def load_spam_ds():
     """
@@ -51,10 +51,27 @@ def run(n=0, method=None):
     ds = load_spam_ds()
     if method:
         ds = univariate_feature_selection(n, ds)
-    training_set, test_set = split_train_test(ds)
-    classifier = naive_bayes_classifier(ds, training_set)
-    cm = classify(classifier, test_set)
-    print(cm)
+    evaluate(ds, naive_bayes)
 
+def evaluate(ds, classifier_class=naive_bayes_custom, iterations=10):
+    ''' 
+    Train a given classifier n times
+    and prints his confusion matrix and the accuracy of the classifier
+    with a margin of error (by Chebychev Inequation)
+    '''
+    results = []
+    for i in xrange(iterations):
+        training_set, test_set = split_train_test(ds)
+        classifier = classifier_class(training_set)
+        cm = 1.0 * classifier.classify(test_set) / len(test_set.data)
+        results += [cm]
+    cm_mean = mean(results, axis=0)
+    cm_variance = var(results, axis=0)
+    
+    
+    print "Accuracy of", sum(diag(cm_mean))*100, "% (+-", iterations * sum(diag(cm_variance)), ") with", (1 - 1.0/(iterations*iterations)) , "of certain." 
+    print "\nConfusion Matrix:\n",cm_mean
+    
 if __name__ == "__main__":
+    seterr(all='ignore')
     run()
