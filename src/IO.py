@@ -2,10 +2,10 @@
 
 from datatypes import Dataset
 from classifier import *
+from feature_selection import *
 
-from feature_selection import univariate_feature_selection
 from sklearn.cross_validation import train_test_split
-from numpy import mean, var, sum, diag
+from numpy import mean, var, sum, diag, shape
 
 def load_spam_ds():
     """
@@ -44,16 +44,16 @@ def split_train_test(ds):
     test_set = Dataset(samples_test, classes_test)
     return training_set, test_set
 
-def run(n=0, method=None):
+def run(n=0, dimension_reduction=univariate_feature_selection, learning=naive_bayes_custom):
     """
     Starts the classification Pipeline
     """
     ds = load_spam_ds()
-    if method:
-        ds = univariate_feature_selection(n, ds)
-    evaluate(ds, naive_bayes)
+    if n > 0 and n < len(ds.data):
+        ds = dimension_reduction(ds, n)
+    evaluate(ds, learning)
 
-def evaluate(ds, classifier_class=naive_bayes_custom, iterations=10):
+def evaluate(ds, classifier_class, iterations=10):
     ''' 
     Train a given classifier n times
     and prints his confusion matrix and the accuracy of the classifier
@@ -74,4 +74,4 @@ def evaluate(ds, classifier_class=naive_bayes_custom, iterations=10):
     
 if __name__ == "__main__":
     seterr(all='ignore')
-    run()
+    run(10, pca, svm)
