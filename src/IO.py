@@ -1,8 +1,8 @@
 # coding> utf-8
 
 from datatypes import Dataset
-from classifier import *
-from feature_selection import *
+from classifier import naive_bayes, svm, naive_bayes_custom, knn
+from feature_selection import univariate_feature_selection, lda, pca
 
 from sklearn.cross_validation import train_test_split
 from numpy import mean, var, sum, diag, shape
@@ -73,5 +73,4 @@ def evaluate(ds, classifier_class, iterations=10):
     print "\nConfusion Matrix:\n",cm_mean
     
 if __name__ == "__main__":
-    seterr(all='ignore')
-    run(10, pca, svm)
+    run(0, lda, knn)
