@@ -2,7 +2,7 @@
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.metrics import confusion_matrix
-from numpy import *
+from numpy import mean, std, prod, tile, sqrt, power, divide, multiply, exp 
 
 class naive_bayes():
     def __init__(self, training_set):
@@ -57,7 +57,7 @@ class naive_bayes_custom():
         mean = tile( mean, ( len(features), 1 ) )
         std = tile( std, ( len(features), 1 ) )
         
-        constant = sqrt(2*pi)
+        constant = sqrt(2*(3.1415))
         factor = power( constant * std, -1.0)
         expoent = - divide( power( features - mean, 2), (2 * power(std,2) ) )
         

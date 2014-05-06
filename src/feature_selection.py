@@ -2,7 +2,6 @@
 
 from datatypes import Dataset
 
-from numpy import * 
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.lda import LDA
 from sklearn.qda import QDA
