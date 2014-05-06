@@ -1,11 +1,11 @@
 # coding> utf-8
 
 from datatypes import Dataset
-from classifier import naive_bayes_classifier, classify
-from feature_selection import univariate_feature_selection
+from classifier import *
+from feature_selection import *
 
 from sklearn.cross_validation import train_test_split
-
+from numpy import mean, var, sum, diag, shape
 
 def load_spam_ds():
     """
@@ -44,17 +44,34 @@ def split_train_test(ds):
     test_set = Dataset(samples_test, classes_test)
     return training_set, test_set
 
-def run(n=0, method=None):
+def run(n=0, dimension_reduction=univariate_feature_selection, learning=naive_bayes_custom):
     """
     Starts the classification Pipeline
     """
     ds = load_spam_ds()
-    if method:
-        ds = univariate_feature_selection(n, ds)
-    training_set, test_set = split_train_test(ds)
-    classifier = naive_bayes_classifier(ds, training_set)
-    cm = classify(classifier, test_set)
-    print(cm)
+    if n > 0 and n < len(ds.data):
+        ds = dimension_reduction(ds, n)
+    evaluate(ds, learning)
 
+def evaluate(ds, classifier_class, iterations=10):
+    ''' 
+    Train a given classifier n times
+    and prints his confusion matrix and the accuracy of the classifier
+    with a margin of error (by Chebychev Inequation)
+    '''
+    results = []
+    for i in xrange(iterations):
+        training_set, test_set = split_train_test(ds)
+        classifier = classifier_class(training_set)
+        cm = 1.0 * classifier.classify(test_set) / len(test_set.data)
+        results += [cm]
+    cm_mean = mean(results, axis=0)
+    cm_variance = var(results, axis=0)
+    
+    
+    print "Accuracy of", sum(diag(cm_mean))*100, "% (+-", iterations * sum(diag(cm_variance)), ") with", (1 - 1.0/(iterations*iterations)) , "of certain." 
+    print "\nConfusion Matrix:\n",cm_mean
+    
 if __name__ == "__main__":
-    run()
+    seterr(all='ignore')
+    run(10, pca, svm)
