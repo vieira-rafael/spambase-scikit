@@ -28,9 +28,6 @@ def lda(ds, n):
     selector.fit(ds.data, ds.target)
     new_data = selector.transform(ds.data)
     return Dataset(new_data, ds.target)
-
-def qda(ds,n):
-    pass
     
 def pca(ds,n):
     '''
