@@ -1,6 +1,10 @@
 # coding: utf-8
+
+
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+
 from sklearn.metrics import confusion_matrix
 from numpy import mean, std, prod, tile, sqrt, power, divide, multiply, exp 
 
@@ -88,3 +92,12 @@ class svm():
         predictions = self.classifier.predict(test_set.data)
         return confusion_matrix(test_set.target, predictions)
 
+class knn():
+
+    def __init__(self, training_set):
+        self.classifier = KNeighborsClassifier()
+        self.classifier.fit(training_set.data, training_set.target)
+
+    def classify(self, test_set):
+        predictions = self.classifier.predict(test_set.data)
+        return confusion_matrix(predictions, test_set.target)
