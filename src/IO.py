@@ -20,7 +20,7 @@ def load_spam_ds():
     with open("data/spambase.data", "r") as f:
         for line in f:
             # Removes \r\n from line
-            line = line[:-2]
+            line = line.replace("\n","").replace("\r","")
             
             items = line.split(",")
             features = [float(item) for item in items[:-1]]
@@ -60,7 +60,7 @@ def evaluate(ds, classifier_class, iterations=10):
     with a margin of error (by Chebychev Inequation)
     '''
     results = []
-    for i in xrange(iterations):
+    for i in range(iterations):
         training_set, test_set = split_train_test(ds)
         classifier = classifier_class(training_set)
         cm = 1.0 * classifier.classify(test_set) / len(test_set.data)
@@ -68,9 +68,22 @@ def evaluate(ds, classifier_class, iterations=10):
     cm_mean = mean(results, axis=0)
     cm_variance = var(results, axis=0)
     
-    
-    print "Accuracy of", sum(diag(cm_mean))*100, "% (+-", iterations * sum(diag(cm_variance)), ") with", (1 - 1.0/(iterations*iterations)) , "of certain." 
-    print "\nConfusion Matrix:\n",cm_mean
+    print ("Accuracy of", sum(diag(cm_mean))*100, "% (+-", iterations * sum(diag(cm_variance)), ") with", (1 - 1.0/(iterations*iterations)),  "of certain." )
+    print ("\nConfusion Matrix:\n",cm_mean,"\n")
     
 if __name__ == "__main__":
-    run(0, lda, knn)
+    algo=[naive_bayes_custom, naive_bayes, knn, svm]
+    feature=[univariate_feature_selection, pca, lda]
+    num=[1,10,0]
+    for n in num:
+        for f in feature:
+            if (n==0):
+                print("\nUsing all features")
+            else:
+                print("\nUsing",n,"feature(s) (", f.__name__, ")" )
+            print("=======================================================\n")    
+            for a in algo:
+                print("* Learning Algorithm:", a.__name__)
+                run(n, f, a)
+            if (n==0):
+                break
