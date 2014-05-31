@@ -6,7 +6,7 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
 from sklearn.metrics import confusion_matrix
-from numpy import mean, std, prod, tile, sqrt, power, divide, multiply, exp 
+from numpy import mean, std, tile, sqrt, power, sum, log
 
 class naive_bayes():
     def __init__(self, training_set):
@@ -45,7 +45,6 @@ class naive_bayes_custom():
         self.spam_mean = mean(spam_set, axis=0)
         self.not_spam_mean = mean(not_spam_set, axis=0)
 
-
         self.spam_std = std(spam_set, axis=0)
         self.not_spam_std = std(not_spam_set, axis=0)
 
@@ -54,24 +53,29 @@ class naive_bayes_custom():
     def __priorProb(self, features, mean, std):
         '''
             An auxiliary function used on classify method.
-            It gives me the result of pdf of the Normal Distribution 
+            It gives the result of the log of pdf of the Normal Distribution 
             (for a given mean and standard deviation)
             on a features' vector
-        '''
+ 
+        ''' 
         mean = tile( mean, ( len(features), 1 ) )
         std = tile( std, ( len(features), 1 ) )
-        
+
+        #Get rid of the division by zero error =)
+        std[std==0] = 0.00000000001
+
         constant = sqrt(2*(3.1415))
-        factor = power( constant * std, -1.0)
-        expoent = - divide( power( features - mean, 2), (2 * power(std,2) ) )
+        factor = - log( constant * std )
+        expoent = - power( features - mean, 2) / (2 * power(std,2) ) 
         
-        return multiply( factor, exp(expoent) )        
-            
+        return factor + expoent 
 
     def classify(self, test_set):
+        spam_prior = self.__priorProb(test_set.data, self.spam_mean, self.spam_std)
+        spam_prob = sum( spam_prior, axis=1 ) + log( self.spam_prob )
 
-        spam_prob = prod( self.__priorProb(test_set.data, self.spam_mean, self.spam_std), axis=1 ) * self.spam_prob
-        not_spam_prob = prod( self.__priorProb(test_set.data, self.not_spam_mean, self.not_spam_std), axis=1 ) * (1.0 - self.spam_prob)
+        not_spam_prior = self.__priorProb(test_set.data, self.not_spam_mean, self.not_spam_std) 
+        not_spam_prob = sum( not_spam_prior, axis=1 ) + log(1.0 - self.spam_prob)
         
         predictions = (spam_prob > not_spam_prob)*1
         
